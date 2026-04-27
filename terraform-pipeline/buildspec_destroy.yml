@@ -1,0 +1,14 @@
+version: 0.2
+phases:
+  install:
+    commands:
+      - curl -sL "https://releases.hashicorp.com/terraform/${TF_VERSION}/terraform_${TF_VERSION}_linux_amd64.zip" -o terraform.zip
+      - unzip -q terraform.zip -d /usr/local/bin
+      - terraform version
+  pre_build:
+    commands:
+      - cd ${TF_WORKING_DIR}
+      - terraform init -input=false
+  build:
+    commands:
+      - terraform destroy -auto-approve -no-color -input=false
