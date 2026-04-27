@@ -1,5 +1,5 @@
-name: terraform-destroy
-run-name: terraform-destroy
+name: terraform-destroy-github-runner
+run-name: terraform-destroy-github-runner
 
 on:
   workflow_dispatch:

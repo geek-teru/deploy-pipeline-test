@@ -1,5 +1,5 @@
-name: terraform-plan
-run-name: terraform-plan
+name: terraform-plan-codebuild-runner
+run-name: terraform-plan-codebuild-runner
 
 on:
   pull_request:
@@ -15,7 +15,7 @@ permissions:
 
 jobs:
   plan:
-    runs-on: ubuntu-latest
+    runs-on: codebuild-deploy-pipeline-test-${{ github.run_id }}-${{ github.run_attempt }}
 
     defaults:
       run:
@@ -27,12 +27,6 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-
-      - name: AWS login
-        uses: aws-actions/configure-aws-credentials@v2
-        with:
-          role-to-assume: arn:aws:iam::${{ secrets.AWS_ACCOUNT_ID }}:role/${{ secrets.AWS_CICD_ROLE_NAME }}
-          aws-region: ${{ env.AWS_REGION }}
 
       - uses: hashicorp/setup-terraform@v2
         with:
