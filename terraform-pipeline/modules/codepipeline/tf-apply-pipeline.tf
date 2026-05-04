@@ -1,27 +1,8 @@
-# アーティファクト保存用 S3 バケット
-resource "aws_s3_bucket" "pipeline_artifacts" {
-  bucket        = "${var.project}-pipeline-artifacts-${data.aws_caller_identity.current.account_id}"
-  force_destroy = true
-}
-
-resource "aws_s3_bucket_public_access_block" "pipeline_artifacts" {
-  bucket = aws_s3_bucket.pipeline_artifacts.id
-
-  block_public_acls       = true
-  block_public_policy     = true
-  ignore_public_acls      = true
-  restrict_public_buckets = true
-}
-
-locals {
-  github_connection_arn = "arn:aws:codeconnections:ap-northeast-1:775538353788:connection/049c37a9-d71e-4688-88b5-861767aba7d1"
-  chatbot_arn           = "arn:aws:chatbot::775538353788:chat-configuration/slack-channel/testworkspace"
-}
-
-# CodePipeline: Plan → Approve → Apply
-resource "aws_codepipeline" "terraform" {
-  name     = "${var.project}-terraform-pipeline"
-  role_arn = aws_iam_role.codepipeline.arn
+# terraform-apply パイプライン: push → Plan → Approve → Apply
+resource "aws_codepipeline" "terraform_apply" {
+  name          = "${var.environment}-${var.project}-terraform-apply"
+  role_arn      = aws_iam_role.codepipeline.arn
+  pipeline_type = "V2"
 
   artifact_store {
     location = aws_s3_bucket.pipeline_artifacts.bucket
@@ -40,7 +21,7 @@ resource "aws_codepipeline" "terraform" {
       output_artifacts = ["source_output"]
 
       configuration = {
-        ConnectionArn    = local.github_connection_arn
+        ConnectionArn    = var.github_connection_arn
         FullRepositoryId = var.github_repository_id
         BranchName       = var.github_branch
       }
@@ -59,7 +40,7 @@ resource "aws_codepipeline" "terraform" {
       input_artifacts = ["source_output"]
 
       configuration = {
-        ProjectName = aws_codebuild_project.terraform_plan.name
+        ProjectName = var.codebuild_plan_project_name
       }
     }
   }
@@ -92,7 +73,25 @@ resource "aws_codepipeline" "terraform" {
       input_artifacts = ["source_output"]
 
       configuration = {
-        ProjectName = aws_codebuild_project.terraform_apply.name
+        ProjectName = var.codebuild_apply_project_name
+      }
+    }
+  }
+
+  trigger {
+    provider_type = "CodeStarSourceConnection"
+    git_configuration {
+      source_action_name = "Source"
+      push {
+        branches {
+          includes = [var.github_branch]
+        }
+        dynamic "file_paths" {
+          for_each = length(var.trigger_file_paths) > 0 ? [1] : []
+          content {
+            includes = var.trigger_file_paths
+          }
+        }
       }
     }
   }
@@ -100,11 +99,9 @@ resource "aws_codepipeline" "terraform" {
 
 # 承認通知ルール (Amazon Q Developer in chat applications)
 resource "aws_codestarnotifications_notification_rule" "pipeline_approval" {
-  name        = "${var.project}-pipeline-approval"
-  resource    = aws_codepipeline.terraform.arn
+  name        = "${var.environment}-${var.project}-pipeline-approval"
+  resource    = aws_codepipeline.terraform_apply.arn
   detail_type = "FULL"
-
-  depends_on = [aws_iam_service_linked_role.codestar_notifications]
 
   event_type_ids = [
     "codepipeline-pipeline-manual-approval-needed",
@@ -112,6 +109,6 @@ resource "aws_codestarnotifications_notification_rule" "pipeline_approval" {
 
   target {
     type    = "AWSChatbotSlack"
-    address = local.chatbot_arn
+    address = var.chatbot_arn
   }
 }

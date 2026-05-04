@@ -5,4 +5,3 @@ github_repository_url       = "https://github.com/geek-teru/deploy-pipeline-test
 github_repository_id        = "geek-teru/deploy-pipeline-test"
 github_branch               = "main"
 terraform_state_bucket      = "terraform-775538353788"
-approval_notification_email = "your-email@example.com"

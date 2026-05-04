@@ -1,13 +1,6 @@
-data "aws_caller_identity" "current" {}
-
-# CodeBuild サービスロール (既存ロールを参照)
-data "aws_iam_role" "codebuild" {
-  name = "deploy-pipeline-test-role"
-}
-
-# CodePipeline サービスロール
+# 共通 CodePipeline サービスロール
 resource "aws_iam_role" "codepipeline" {
-  name = "${var.project}-codepipeline-role"
+  name = "${var.environment}-${var.project}-codepipeline-role"
 
   assume_role_policy = jsonencode({
     Version = "2012-10-17"
@@ -24,7 +17,7 @@ resource "aws_iam_role" "codepipeline" {
 }
 
 resource "aws_iam_role_policy" "codepipeline" {
-  name = "${var.project}-codepipeline-policy"
+  name = "${var.environment}-${var.project}-codepipeline-policy"
   role = aws_iam_role.codepipeline.id
 
   policy = jsonencode({
@@ -51,16 +44,15 @@ resource "aws_iam_role_policy" "codepipeline" {
           "codebuild:BatchGetBuilds"
         ]
         Resource = [
-          aws_codebuild_project.terraform_plan.arn,
-          aws_codebuild_project.terraform_apply.arn
+          var.codebuild_plan_project_arn,
+          var.codebuild_apply_project_arn
         ]
       },
       {
         Effect   = "Allow"
         Action   = "codeconnections:UseConnection"
-        Resource = local.github_connection_arn
+        Resource = var.github_connection_arn
       },
-
     ]
   })
 }

@@ -37,11 +37,6 @@ variable "github_branch" {
   default     = "main"
 }
 
-variable "approval_notification_email" {
-  description = "承認通知の送信先メールアドレス"
-  type        = string
-}
-
 variable "terraform_state_bucket" {
   description = "Terraform stateを保存するS3バケット名"
   type        = string

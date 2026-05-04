@@ -30,10 +30,10 @@ output "pipeline_artifacts_bucket" {
 
 output "github_connection_arn" {
   description = "GitHub CodeStar Connection ARN"
-  value       = data.aws_codestarconnections_connection.github.arn
+  value       = local.github_connection_arn
 }
 
-output "approval_sns_topic_arn" {
-  description = "承認通知 SNS トピック ARN"
-  value       = aws_sns_topic.pipeline_approval.arn
+output "notification_rule_arn" {
+  description = "承認通知ルール ARN"
+  value       = aws_codestarnotifications_notification_rule.pipeline_approval.arn
 }
