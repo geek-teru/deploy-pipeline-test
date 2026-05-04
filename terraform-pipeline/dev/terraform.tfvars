@@ -1,0 +1,7 @@
+aws_region            = "ap-northeast-1"
+project               = "deploy-pipeline"
+environment           = "dev"
+github_repository_url = "https://github.com/geek-teru/deploy-pipeline-test"
+github_repository_id  = "geek-teru/deploy-pipeline-test"
+github_branch         = "main"
+trigger_file_paths    = ["terraform-resource/**"]
