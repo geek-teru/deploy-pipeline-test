@@ -87,9 +87,9 @@ resource "aws_codepipeline" "terraform_apply" {
           includes = [var.github_branch]
         }
         dynamic "file_paths" {
-          for_each = length(var.trigger_file_paths) > 0 ? [1] : []
+          for_each = var.trigger_file_path != "" ? [1] : []
           content {
-            includes = var.trigger_file_paths
+            includes = [var.trigger_file_path]
           }
         }
       }
@@ -97,13 +97,16 @@ resource "aws_codepipeline" "terraform_apply" {
   }
 }
 
-# 承認通知ルール (Amazon Q Developer in chat applications)
-resource "aws_codestarnotifications_notification_rule" "pipeline_approval" {
-  name        = "${var.environment}-${var.project}-pipeline-approval"
+# 通知ルール
+resource "aws_codestarnotifications_notification_rule" "apply_pipeline" {
+  name        = "${var.environment}-${var.project}-apply-pipeline"
   resource    = aws_codepipeline.terraform_apply.arn
   detail_type = "FULL"
 
   event_type_ids = [
+    "codepipeline-pipeline-pipeline-execution-started",
+    "codepipeline-pipeline-pipeline-execution-succeeded",
+    "codepipeline-pipeline-pipeline-execution-failed",
     "codepipeline-pipeline-manual-approval-needed",
   ]
 

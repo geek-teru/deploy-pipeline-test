@@ -14,13 +14,6 @@ resource "aws_codebuild_project" "terraform_plan" {
     type                        = "LINUX_CONTAINER"
     image_pull_credentials_type = "CODEBUILD"
 
-    dynamic "environment_variable" {
-      for_each = local.common_environment
-      content {
-        name  = environment_variable.value.name
-        value = environment_variable.value.value
-      }
-    }
   }
 
   source {
@@ -32,7 +25,11 @@ resource "aws_codebuild_project" "terraform_plan" {
       fetch_submodules = false
     }
 
-    buildspec = file("${path.module}/buildspec_plan.yml")
+    buildspec = templatefile("${path.module}/buildspec_plan.yml", {
+      tf_version     = var.tf_version
+      tf_working_dir = var.tf_working_dir
+      env            = var.environment
+    })
   }
 
   logs_config {

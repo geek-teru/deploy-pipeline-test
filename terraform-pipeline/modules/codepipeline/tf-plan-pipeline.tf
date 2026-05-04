@@ -51,17 +51,35 @@ resource "aws_codepipeline" "terraform_plan" {
     git_configuration {
       source_action_name = "Source"
       pull_request {
-        events = ["OPEN", "UPDATED", "CLOSED"]
+        events = ["OPEN", "UPDATED"]
         branches {
           includes = [var.github_branch]
         }
         dynamic "file_paths" {
-          for_each = length(var.trigger_file_paths) > 0 ? [1] : []
+          for_each = var.trigger_file_path != "" ? [1] : []
           content {
-            includes = var.trigger_file_paths
+            includes = [var.trigger_file_path]
           }
         }
       }
     }
+  }
+}
+
+# 実行通知ルール
+resource "aws_codestarnotifications_notification_rule" "plan_pipeline_execution" {
+  name        = "${var.environment}-${var.project}-plan-pipeline-execution"
+  resource    = aws_codepipeline.terraform_plan.arn
+  detail_type = "FULL"
+
+  event_type_ids = [
+    "codepipeline-pipeline-pipeline-execution-started",
+    "codepipeline-pipeline-pipeline-execution-succeeded",
+    "codepipeline-pipeline-pipeline-execution-failed",
+  ]
+
+  target {
+    type    = "AWSChatbotSlack"
+    address = var.chatbot_arn
   }
 }

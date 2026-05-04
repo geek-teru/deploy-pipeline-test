@@ -13,11 +13,6 @@ output "codebuild_destroy_project_name" {
   value       = aws_codebuild_project.terraform_destroy.name
 }
 
-output "codebuild_role_arn" {
-  description = "CodeBuild サービスロール ARN"
-  value       = data.aws_iam_role.codebuild.arn
-}
-
 output "codepipeline_name" {
   description = "CodePipeline 名"
   value       = aws_codepipeline.terraform.name
@@ -26,11 +21,6 @@ output "codepipeline_name" {
 output "pipeline_artifacts_bucket" {
   description = "パイプラインアーティファクト S3 バケット名"
   value       = aws_s3_bucket.pipeline_artifacts.bucket
-}
-
-output "github_connection_arn" {
-  description = "GitHub CodeStar Connection ARN"
-  value       = local.github_connection_arn
 }
 
 output "notification_rule_arn" {

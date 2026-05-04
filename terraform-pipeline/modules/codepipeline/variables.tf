@@ -19,6 +19,12 @@ variable "github_branch" {
   default     = "main"
 }
 
+variable "trigger_file_path" {
+  description = "パイプラインをトリガーするファイルパスパターン (空の場合は全変更でトリガー)"
+  type        = string
+  default     = ""
+}
+
 variable "github_connection_arn" {
   description = "GitHub CodeStar Connection ARN"
   type        = string
@@ -49,8 +55,4 @@ variable "codebuild_apply_project_arn" {
   type        = string
 }
 
-variable "trigger_file_paths" {
-  description = "パイプラインをトリガーするファイルパスパターン (空の場合は全変更でトリガー)"
-  type        = list(string)
-  default     = []
-}
+

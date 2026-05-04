@@ -2,12 +2,12 @@ version: 0.2
 phases:
   install:
     commands:
-      - curl -sL "https://releases.hashicorp.com/terraform/${TF_VERSION}/terraform_${TF_VERSION}_linux_amd64.zip" -o terraform.zip
+      - curl -sL "https://releases.hashicorp.com/terraform/${tf_version}/terraform_${tf_version}_linux_amd64.zip" -o terraform.zip
       - unzip -q terraform.zip -d /usr/local/bin
       - terraform version
   pre_build:
     commands:
-      - cd ${TF_WORKING_DIR}/${ENV}
+      - cd ${tf_working_dir}/${env}
       - terraform fmt -check -recursive
       - terraform init -input=false
       - terraform validate -no-color

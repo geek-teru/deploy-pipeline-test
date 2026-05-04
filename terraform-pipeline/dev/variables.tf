@@ -37,8 +37,8 @@ variable "github_branch" {
   default     = "main"
 }
 
-variable "trigger_file_paths" {
+variable "trigger_file_path" {
   description = "パイプラインをトリガーするファイルパスパターン (空の場合は全変更でトリガー)"
-  type        = list(string)
-  default     = []
+  type        = string
+  default     = ""
 }

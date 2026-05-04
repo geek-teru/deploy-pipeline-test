@@ -40,6 +40,8 @@ module "codebuild" {
   environment           = var.environment
   github_repository_url = var.github_repository_url
   codebuild_role_name   = "deploy-pipeline-test-role"
+  tf_version            = "1.6.6"
+  tf_working_dir        = "terraform-resource"
 }
 
 module "codepipeline" {
@@ -55,6 +57,6 @@ module "codepipeline" {
   codebuild_plan_project_arn   = module.codebuild.plan_project_arn
   codebuild_apply_project_name = module.codebuild.apply_project_name
   codebuild_apply_project_arn  = module.codebuild.apply_project_arn
-  trigger_file_paths           = var.trigger_file_paths
+  trigger_file_path            = var.trigger_file_path
 }
 

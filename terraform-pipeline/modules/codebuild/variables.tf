@@ -17,3 +17,13 @@ variable "environment" {
   description = "環境名 (dev / stg / prd)"
   type        = string
 }
+
+variable "tf_version" {
+  description = "使用するTerraformのバージョン"
+  type        = string
+}
+
+variable "tf_working_dir" {
+  description = "Terraformの作業ディレクトリ（リポジトリルートからの相対パス）"
+  type        = string
+}
