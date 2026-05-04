@@ -7,7 +7,7 @@ variable "aws_region" {
 variable "project" {
   description = "プロジェクト名"
   type        = string
-  default     = "deploy-pipeline"
+  default     = "deploy"
 }
 
 variable "environment" {
@@ -24,11 +24,13 @@ variable "environment" {
 variable "github_repository_url" {
   description = "GitHubリポジトリURL"
   type        = string
+  default     = "https://github.com/geek-teru/deploy-pipeline-test"
 }
 
 variable "github_repository_id" {
   description = "GitHubリポジトリID (owner/repo形式)"
   type        = string
+  default     = "geek-teru/deploy-pipeline-test"
 }
 
 variable "github_branch" {
@@ -40,5 +42,5 @@ variable "github_branch" {
 variable "trigger_file_path" {
   description = "パイプラインをトリガーするファイルパスパターン (空の場合は全変更でトリガー)"
   type        = string
-  default     = ""
+  default     = "terraform-resource/**"
 }
