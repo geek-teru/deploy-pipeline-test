@@ -7,7 +7,7 @@ variable "aws_region" {
 variable "project" {
   description = "プロジェクト名"
   type        = string
-  default     = "deploy-pipeline"
+  default     = "test-resource"
 }
 
 variable "environment" {
