@@ -19,7 +19,7 @@ jobs:
 
     defaults:
       run:
-        working-directory: terraform-resource
+        working-directory: terraform-resource/dev
 
     env:
       AWS_REGION: ap-northeast-1
