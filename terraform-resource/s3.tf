@@ -1,7 +1,7 @@
 data "aws_caller_identity" "current" {}
 
 resource "aws_s3_bucket" "app" {
-  bucket        = "${var.environment}-${var.project}-${data.aws_caller_identity.current.account_id}"
+  bucket        = "${var.environment}-${var.project}-${data.aws_caller_identity.current.account_id}-${var.aws_region}"
   force_destroy = true
 }
 
