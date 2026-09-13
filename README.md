@@ -7,83 +7,54 @@ Terraform を用いた AWS リソースの CI/CD パイプライン実装サン�
 
 ```
 deploy-pipeline/
-├── terraform-resource/   # デプロイ対象の AWS リソース (Terraform)
-└── terraform-pipeline/   # CI/CD パイプライン自体の AWS リソース (Terraform)
+├── .github/workflows/
+│   ├── terraform-<action>-github-runner.yml      # (1) GitHub Actions
+│   └── terraform-<action>-codebuild-runner.yml   # (2) GitHub Actions + CodeBuild ホストランナー
+│
+├── terraform-pipeline/　                         # (3) CodePipeline + CodeBuild
+│   ├── dev/
+│   ├── modules/
+│   │   ├── codebuild/          # CodeBuild プロジェクト
+│   │   └── codepipeline/       # CodePipeline, IAM ロール, アーティファクト用 S3, 通知ルール
+│   └── *.tf, buildspec_*.yml
+│
+└── terraform-resource/         # AWS リソース (デプロイ対象)
+    ├── *.tf
+    ├── dev/
+    └── modules/s3/
 ```
 
+> (2) で使う CodeBuild プロジェクト（`deploy-pipeline-test`）は Terraform の管理外です。
+
 ## デプロイ方式
+
+### 構成図
+
+![deploy-pipeline](images/deploy-pipeline-methods-comparison.drawio.png)
 
 ### (1) GitHub Actions
 
 GitHub Actions のみを使用した純粋なクラウドランナー構成。
 
-- ランナー: GitHub ホステッドランナー
-- 認証: OIDC (OpenID Connect) による一時クレデンシャル取得
-- 特徴: AWSインフラ不要でシンプルに構築できる
-
-```
-GitHub → GitHub Actions Runner → AWS (Terraform apply)
-```
-
 ### (2) GitHub Actions + CodeBuild ホストランナー
 
 GitHub Actions のワークフロー定義を活かしつつ、実行環境を AWS CodeBuild に委譲する構成。
-
-- ランナー: AWS CodeBuild (セルフホステッドランナーとして動作)
-- 認証: CodeBuild に付与した IAM ロール
-- 特徴: VPC 内リソースへのアクセスやランナーのカスタマイズが可能
-
-```
-GitHub → GitHub Actions → CodeBuild Runner → AWS (Terraform apply)
-```
 
 ### (3) CodePipeline + CodeBuild
 
 AWS ネイティブのパイプラインサービスを使用した構成。
 
-- ソース: GitHub (CodeStar Connections 経由)
-- パイプライン: AWS CodePipeline
-- ビルド/デプロイ: AWS CodeBuild
-- 特徴: AWS コンソールで一元管理、CloudWatch との統合が容易
-
-```
-GitHub → CodePipeline → CodeBuild → AWS (Terraform apply)
-```
-
 ## 方式比較
 
-| 項目 | (1) GitHub Actions | (2) GHA + CodeBuild | (3) CodePipeline |
-|---|---|---|---|
-| 設定の複雑さ | 低 | 中 | 中 |
-| AWS インフラコスト | なし | あり | あり |
-| VPC 内アクセス | 不可 | 可能 | 可能 |
-| ランナーカスタマイズ | 限定的 | 柔軟 | 柔軟 |
-| 管理コンソール | GitHub | GitHub / AWS | AWS |
-| IAM 認証方式 | OIDC | IAM ロール | IAM ロール |
-
-## 前提条件
-
-- Terraform >= 1.0
-- AWS CLI 設定済み
-- GitHub リポジトリへの管理者権限
-
-## 使い方
-
-### 1. デプロイ対象リソースの確認
-
-```bash
-cd terraform-resource
-terraform init
-terraform plan
-```
-
-### 2. パイプラインの構築
-
-使用する方式のディレクトリに移動して apply する。
-
-```bash
-cd terraform-pipeline
-terraform init
-terraform plan
-terraform apply
-```
+| 項目                 | (1) GitHub Actions | (2) GHA + CodeBuild | (3) CodePipeline |
+| -------------------- | ------------------ | ------------------- | ---------------- |
+| ソース               | GitHub             | GitHub 　           | GitHub           |
+| トリガー             | GitHub             | GitHub              | CodePipeline     |
+| 承認                 | GitHub             | GitHub              | CodePipeline     |
+| ランナー             | GitHub             | CodeBuild           | CodeBuild        |
+| IAM 認証方式         | OIDC               | サービスロール      | サービスロール   |
+| ログ保存期間         | △ 最大 90日        | △ 最大 90日 　      | 〇 無期限        |
+| 設定の複雑さ         | 〇 簡単            | 〇 簡単             | △ 複雑           |
+| AWS インフラコスト   | 〇 なし            | △ あり              | △ あり           |
+| ランナーカスタマイズ | △ 限定的           | 〇 柔軟             | 〇 柔軟          |
+| VPC 内アクセス       | △ 不可             | 〇 可能             | 〇 可能          |
