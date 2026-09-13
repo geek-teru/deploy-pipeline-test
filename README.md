@@ -28,10 +28,6 @@ deploy-pipeline/
 
 ## デプロイ方式
 
-### 構成図
-
-![deploy-pipeline](images/deploy-pipeline-methods-comparison.drawio.png)
-
 ### (1) GitHub Actions
 
 GitHub Actions のみを使用した純粋なクラウドランナー構成。
@@ -43,6 +39,10 @@ GitHub Actions のワークフロー定義を活かしつつ、実行環境を A
 ### (3) CodePipeline + CodeBuild
 
 AWS ネイティブのパイプラインサービスを使用した構成。
+
+### 構成図
+
+![deploy-pipeline](images/deploy-pipeline-methods-comparison.drawio.png)
 
 ## 方式比較
 
