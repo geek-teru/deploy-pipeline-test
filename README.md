@@ -46,15 +46,16 @@ AWS ネイティブのパイプラインサービスを使用した構成。
 
 ## 方式比較
 
-| 項目                 | (1) GitHub Actions | (2) GHA + CodeBuild | (3) CodePipeline |
-| -------------------- | ------------------ | ------------------- | ---------------- |
-| ソース               | GitHub             | GitHub 　           | GitHub           |
-| トリガー             | GitHub             | GitHub              | CodePipeline     |
-| 承認                 | GitHub             | GitHub              | CodePipeline     |
-| ランナー             | GitHub             | CodeBuild           | CodeBuild        |
-| IAM 認証方式         | OIDC               | サービスロール      | サービスロール   |
-| ログ保存期間         | △ 最大 90日        | △ 最大 90日 　      | 〇 無期限        |
-| 設定の複雑さ         | 〇 簡単            | 〇 簡単             | △ 複雑           |
-| AWS インフラコスト   | 〇 なし            | △ あり              | △ あり           |
-| ランナーカスタマイズ | △ 限定的           | 〇 柔軟             | 〇 柔軟          |
-| VPC 内アクセス       | △ 不可             | 〇 可能             | 〇 可能          |
+| 項目                 | (1) GitHub Actions   | (2) GHA + CodeBuild  | (3) CodePipeline          |
+| -------------------- | -------------------- | -------------------- | ------------------------- |
+| ソース               | GitHub               | GitHub 　            | GitHub                    |
+| トリガー             | GitHub               | GitHub               | CodePipeline              |
+| 承認                 | GitHub               | GitHub               | CodePipeline              |
+| ランナー             | GitHub               | CodeBuild            | CodeBuild                 |
+| IAM 認証方式         | OIDC                 | サービスロール       | サービスロール            |
+| ログ保存期間         | △ 最大 90日          | △ 最大 90日 　       | 〇 無期限                 |
+| 設定の複雑さ         | 〇 簡単              | 〇 簡単              | △ 複雑                    |
+| AWS インフラコスト   | 〇 なし              | △ あり               | △ あり                    |
+| ランナーカスタマイズ | △ 限定的             | 〇 柔軟              | 〇 柔軟                   |
+| VPC 内アクセス       | △ 不可               | 〇 可能              | 〇 可能                   |
+| セキュリティ         | △ GitHub侵害で影響大 | △ GitHub侵害で影響大 | 〇 コードとデプロイを分離 |
